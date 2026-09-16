@@ -1,0 +1,33 @@
+{
+  "name": "CodeWhale",
+  "build": {
+    "context": "..",
+    "dockerfile": "Dockerfile",
+    "args": {
+      "RUST_VERSION": "1.88"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "rust-lang.rust-analyzer",
+        "tamasfe.even-better-toml",
+        "vadimcn.vscode-lldb"
+      ],
+      "settings": {
+        "rust-analyzer.cargo.features": "all",
+        "editor.formatOnSave": true
+      }
+    }
+  },
+  "remoteEnv": {
+    "DEEPSEEK_API_KEY": "${localEnv:DEEPSEEK_API_KEY}",
+    "CARGO_TARGET_DIR": "/home/openproject/.cargo/target"
+  },
+  "mounts": [
+    "source=openproject-state,target=/home/openproject/.openproject,type=volume",
+    "source=openproject-cargo-target,target=/home/openproject/.cargo/target,type=volume"
+  ],
+  "postCreateCommand": "cargo build --locked",
+  "remoteUser": "openproject"
+}
