@@ -1,0 +1,5 @@
+# No suppressions: the old Starlark dependencies are absent from Cargo.lock.
+# Keep remaining maintenance warnings visible in cargo-audit. The separately
+# scoped cargo-deny exception is explained in docs/dependency-maintenance.md.
+[advisories]
+ignore = []
