@@ -1,0 +1,49 @@
+# Ensure LF line endings for files consumed by include_str!() on all platforms.
+# include_str!() preserves raw bytes; CRLF breaks substring assertions and
+# produces different compiled binaries on Windows vs Linux/macOS.
+# Cover nested mode/approval/personality prompts — a top-level *.md glob alone
+# left modes/*.md on CRLF under Windows autocrlf and blew the agent token budget.
+crates/tui/src/prompts/**/*.md text eol=lf
+crates/tui/src/prompts/*.md text eol=lf
+crates/tui/src/prompts/*.txt text eol=lf
+
+# The rest of the include_str!() inputs. `* text=auto` below converts these to
+# CRLF on a Windows checkout, which is invisible for the ones that are only
+# parsed or substring-matched and fatal for the one that is compared byte for
+# byte: crates/telemetry/tests/golden/v1.json is asserted against
+# serde_json::to_string_pretty output, which always emits LF, so Windows CI
+# failed `golden_payload_v1` with a pure \r\n diff.
+crates/telemetry/tests/golden/*.json text eol=lf
+# Tideline component goldens (crates/tui/src/tui/goldens/*.txt) are
+# fs::read_to_string'd and compared byte for byte against buffer dumps that
+# always join rows with LF (golden_harness.rs::render_golden_text), so a
+# CRLF checkout failed all eight Windows golden tests with a pure \r\n diff.
+crates/tui/src/tui/goldens/*.txt text eol=lf
+# FEAT-025 baseline export goldens (crates/tui/src/commands/fixtures/*.md) are
+# include_str!()'d and compared byte for byte against a document the exporter
+# builds with LF, so a CRLF checkout failed the four Windows golden tests with a
+# pure \r\n diff (Windows CI caught this; Linux cannot see it).
+crates/tui/src/commands/fixtures/*.md text eol=lf
+crates/*/assets/**/*.json text eol=lf
+crates/*/assets/**/*.md text eol=lf
+crates/*/locales/*.json text eol=lf
+workflows/*.js text eol=lf
+# The dsh bundle scene is include_str!() into the generated client.js and
+# hashed for stale detection; CRLF would change both across platforms.
+crates/tui/src/integrations/dsh/*.js text eol=lf
+
+# Rustfmt writes LF; keep Rust sources stable across Windows/Linux/macOS.
+*.rs text eol=lf
+
+# Release shell scripts are invoked directly by bash on Windows
+# checkouts; CRLF turns `set -euo pipefail` into an invalid option.
+scripts/release/*.sh text eol=lf
+
+# Keep repository attributes themselves stable on every platform.
+.gitattributes text eol=lf
+
+# Everything else auto-detects (default).
+* text=auto
+
+# Preserve the qualified upstream font license, including its trailing space.
+web/public/brand/fonts/OFL.txt text eol=lf whitespace=-blank-at-eol
